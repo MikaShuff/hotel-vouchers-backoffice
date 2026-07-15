@@ -1,0 +1,40 @@
+.app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: 60px;
+  background: #1976d2;
+  color: white;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 20px;
+
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+}
+
+.navigator {
+  width: 260px;
+
+  background: #f4f4f4;
+
+  border-right: 1px solid #ddd;
+
+  padding: 20px;
+}
+
+.workspace {
+  flex: 1;
+
+  padding: 20px;
+}
