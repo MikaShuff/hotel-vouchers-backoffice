@@ -33,6 +33,7 @@ function Workspace({ selectedPage }) {
   }
 
   useEffect(() => {
+    
     if (selectedPage === "ארגונים") {
       fetchOrganization();
     }
