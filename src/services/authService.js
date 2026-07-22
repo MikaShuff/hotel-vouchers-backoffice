@@ -28,3 +28,13 @@ export async function refreshToken() {
 
     return response.data;
 }
+
+export async function logout() {
+    const savedRefreshToken = localStorage.getItem("refreshToken");
+
+    const response = await api.post("/api/Auth/logout", {
+        refreshToken: savedRefreshToken,
+    });
+
+    return response.data;
+}
