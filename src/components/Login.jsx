@@ -7,20 +7,15 @@ function Login({ onLoginSuccess }) {
   const [otpCode, setOtpCode] = useState("");
 
   async function handleSendOtp() {
-    console.log(userName);
-    console.log(phoneNumber);
-    const response = await sendOtp(userName, phoneNumber);
 
-    console.log(response);
+    await sendOtp(userName, phoneNumber);
   }
 
   async function handleVerifyOtp() {
     const response = await verifyOtp(userName, otpCode);
-    
+
     localStorage.setItem("accessToken", response.accessToken);
     localStorage.setItem("refreshToken", response.refreshToken);
-
-    console.log(response);
 
     if (onLoginSuccess) {
       onLoginSuccess();
