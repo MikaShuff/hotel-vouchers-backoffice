@@ -204,7 +204,9 @@ function UsersPage({ organization, branch, onBack }) {
     <div>
       {renderBreadcrumb()}
 
-      <h2>{renderTitle()}</h2>
+      <div className="page-header">
+        <h2 className="page-title">{renderTitle()}</h2>
+      </div>
 
       <table className="data-table">
         <thead>
@@ -230,13 +232,11 @@ function UsersPage({ organization, branch, onBack }) {
               <td>
                 {editingUserId === user.id ? (
                   <input
+                    className="inline-input"
                     type="text"
                     value={editForm.userName}
                     onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        userName: e.target.value,
-                      })
+                      setEditForm({ ...editForm, userName: e.target.value })
                     }
                   />
                 ) : (
@@ -247,23 +247,22 @@ function UsersPage({ organization, branch, onBack }) {
               <td>
                 {editingUserId === user.id ? (
                   <input
+                    className="inline-input"
                     type="number"
                     value={editForm.roleId}
                     onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        roleId: e.target.value,
-                      })
+                      setEditForm({ ...editForm, roleId: e.target.value })
                     }
                   />
                 ) : (
-                  (user.role ?? user.roleId ?? "-")
+                  user.role ?? user.roleId ?? "-"
                 )}
               </td>
 
               <td>
                 {editingUserId === user.id ? (
                   <input
+                    className="inline-input"
                     type="number"
                     value={editForm.organizationId}
                     onChange={(e) =>
@@ -281,13 +280,11 @@ function UsersPage({ organization, branch, onBack }) {
               <td>
                 {editingUserId === user.id ? (
                   <input
+                    className="inline-input"
                     type="number"
                     value={editForm.branchId}
                     onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        branchId: e.target.value,
-                      })
+                      setEditForm({ ...editForm, branchId: e.target.value })
                     }
                   />
                 ) : (
@@ -298,74 +295,109 @@ function UsersPage({ organization, branch, onBack }) {
               <td>
                 {editingUserId === user.id ? (
                   <input
+                    className="inline-input"
                     type="text"
                     value={editForm.phone}
                     onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        phone: e.target.value,
-                      })
+                      setEditForm({ ...editForm, phone: e.target.value })
                     }
                   />
                 ) : (
-                  (user.phone ?? "-")
+                  user.phone ?? "-"
                 )}
               </td>
 
               <td>
                 {editingUserId === user.id ? (
                   <input
+                    className="inline-input"
                     type="email"
                     value={editForm.email}
                     onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        email: e.target.value,
-                      })
+                      setEditForm({ ...editForm, email: e.target.value })
                     }
                   />
                 ) : (
-                  (user.email ?? "-")
+                  user.email ?? "-"
                 )}
               </td>
 
-              <td>{user.isActive ? "פעיל" : "לא פעיל"}</td>
-
-              <td>{user.lockedUntil ? "חסום" : "-"}</td>
+              <td>
+                {user.isActive ? (
+                  <span className="badge-active">פעיל</span>
+                ) : (
+                  <span className="badge-inactive">לא פעיל</span>
+                )}
+              </td>
 
               <td>
-                {editingUserId === user.id ? (
-                  <>
-                    <button onClick={() => handleUpdateUser(user.id)}>
-                      שמור
-                    </button>
-                    <button onClick={handleCancelEdit}>ביטול</button>
-                  </>
+                {user.lockedUntil ? (
+                  <span className="badge-blocked">חסום</span>
                 ) : (
-                  <>
-                    <button onClick={() => handleEdit(user)}>ערוך</button>
-
-                    {user.isActive ? (
-                      <button onClick={() => handleToggleUserStatus(user)}>
-                        השבת
-                      </button>
-                    ) : (
-                      <button onClick={() => handleToggleUserStatus(user)}>
-                        הפעל
-                      </button>
-                    )}
-
-                    {user.lockedUntil ? (
-                      <button onClick={() => handleToggleUserBlock(user)}>
-                        שחרר חסימה
-                      </button>
-                    ) : (
-                      <button onClick={() => handleToggleUserBlock(user)}>
-                        חסום שעה
-                      </button>
-                    )}
-                  </>
+                  "-"
                 )}
+              </td>
+
+              <td>
+                <div className="action-buttons">
+                  {editingUserId === user.id ? (
+                    <>
+                      <button
+                        className="btn-save"
+                        onClick={() => handleUpdateUser(user.id)}
+                      >
+                        שמור
+                      </button>
+                      <button
+                        className="btn-secondary"
+                        onClick={handleCancelEdit}
+                      >
+                        ביטול
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="btn-edit"
+                        onClick={() => handleEdit(user)}
+                      >
+                        ערוך
+                      </button>
+
+                      {user.isActive ? (
+                        <button
+                          className="btn-danger"
+                          onClick={() => handleToggleUserStatus(user)}
+                        >
+                          השבת
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-success"
+                          onClick={() => handleToggleUserStatus(user)}
+                        >
+                          הפעל
+                        </button>
+                      )}
+
+                      {user.lockedUntil ? (
+                        <button
+                          className="btn-success"
+                          onClick={() => handleToggleUserBlock(user)}
+                        >
+                          שחרר חסימה
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-danger"
+                          onClick={() => handleToggleUserBlock(user)}
+                        >
+                          חסום שעה
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
