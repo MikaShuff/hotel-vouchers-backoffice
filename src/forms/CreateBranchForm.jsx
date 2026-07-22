@@ -1,19 +1,18 @@
 import { useState } from "react";
-import { createOrganization } from "../services/organizationService";
+import { createBranch } from "../services/branchService";
 import styles from "./CreateOrganizationForm.module.css";
 
-function CreateOrganizationForm({ onCreated, onCancel }) {
+function CreateBranchForm({ organization, onCreated, onCancel }) {
   const [name, setName] = useState("");
-  const [commission, setCommission] = useState("");
+  const [terminalUniqueIdentifier, setTerminalUniqueIdentifier] = useState("");
   const [maxWithdrawAmount, setMaxWithdrawAmount] = useState("");
-  const [allowCancel, setAllowCancel] = useState(false);
 
   async function handleSave() {
     try {
-      await createOrganization(
+      await createBranch(
         name,
-        Number(commission),
-        allowCancel,
+        organization.id,
+        terminalUniqueIdentifier,
         maxWithdrawAmount === "" ? null : Number(maxWithdrawAmount),
       );
 
@@ -22,18 +21,15 @@ function CreateOrganizationForm({ onCreated, onCancel }) {
       }
     } catch (error) {
       console.error(error);
-      alert("שגיאה ביצירת ארגון");
+      alert("שגיאה ביצירת הסניף");
     }
   }
 
   return (
     <div className={styles.overlay} onClick={onCancel}>
-      <div
-        className={styles.form}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className={styles.form} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h3 className={styles.title}>הוספת ארגון</h3>
+          <h3 className={styles.title}>הוספת סניף ל-{organization.name}</h3>
           <button
             className={styles.closeButton}
             onClick={onCancel}
@@ -44,24 +40,24 @@ function CreateOrganizationForm({ onCreated, onCancel }) {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>שם ארגון</label>
+          <label className={styles.label}>שם סניף</label>
           <input
             className={styles.input}
             type="text"
-            placeholder="לדוגמה: Isrotel"
+            placeholder="לדוגמה: אילת"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>עמלה (%)</label>
+          <label className={styles.label}>מזהה מסוף</label>
           <input
             className={styles.input}
-            type="number"
-            placeholder="לדוגמה: 12.5"
-            value={commission}
-            onChange={(e) => setCommission(e.target.value)}
+            type="text"
+            placeholder="מזהה ייחודי של המסוף"
+            value={terminalUniqueIdentifier}
+            onChange={(e) => setTerminalUniqueIdentifier(e.target.value)}
           />
         </div>
 
@@ -74,19 +70,6 @@ function CreateOrganizationForm({ onCreated, onCancel }) {
             value={maxWithdrawAmount}
             onChange={(e) => setMaxWithdrawAmount(e.target.value)}
           />
-        </div>
-
-        <div className={styles.checkboxField}>
-          <input
-            className={styles.checkbox}
-            type="checkbox"
-            id="allowCancel"
-            checked={allowCancel}
-            onChange={(e) => setAllowCancel(e.target.checked)}
-          />
-          <label htmlFor="allowCancel" className={styles.checkboxLabel}>
-            אפשר ביטול
-          </label>
         </div>
 
         <div className={styles.actions}>
@@ -106,4 +89,4 @@ function CreateOrganizationForm({ onCreated, onCancel }) {
   );
 }
 
-export default CreateOrganizationForm;
+export default CreateBranchForm;

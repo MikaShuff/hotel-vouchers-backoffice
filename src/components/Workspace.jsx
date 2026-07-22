@@ -31,7 +31,7 @@ function Workspace({ selectedPage }) {
   return (
     <div className={styles.workspace}>
       <h2>{selectedPage}</h2>
-      <p>זה מסך {selectedPage}</p>
+      <p className={styles.placeholder}>זה מסך {selectedPage}</p>
     </div>
   );
 }

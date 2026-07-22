@@ -1,0 +1,73 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.welcome {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.welcomeTitle {
+  margin: 0 0 8px 0;
+  color: #1976d2;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.welcomeSubtitle {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 0.15s;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.cardLabel {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+}
+
+.cardValue {
+  font-size: 32px;
+  font-weight: 600;
+  color: #333;
+}
+
+.cardSubtext {
+  font-size: 12px;
+  color: #4caf50;
+}
+
+.cardSubtextInactive {
+  font-size: 12px;
+  color: #999;
+}
+
+.loading {
+  color: #888;
+  font-size: 14px;
+}
