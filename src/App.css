@@ -11,11 +11,27 @@
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
   padding: 0 20px;
 
   font-size: 22px;
   font-weight: bold;
+}
+
+.logout-button {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .main-content {

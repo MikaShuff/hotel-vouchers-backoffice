@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { refreshToken } from "./services/authService";
+import { refreshToken, logout } from "./services/authService";
 import Navigator from "./components/Navigator";
 import Workspace from "./components/Workspace";
 import "./App.css";
 import Login from "./components/Login";
-// import Dashboard from "./components/Dashboard";
 
 function App() {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
@@ -12,7 +11,6 @@ function App() {
 
   useEffect(() => {
     async function validateSession() {
-     
       const savedRefreshToken = localStorage.getItem("refreshToken");
 
       if (!savedRefreshToken) {
@@ -23,7 +21,6 @@ function App() {
         const response = await refreshToken();
 
         localStorage.setItem("accessToken", response.accessToken);
-
         localStorage.setItem("refreshToken", response.refreshToken);
 
         setIsAuthenticated(true);
@@ -47,7 +44,6 @@ function App() {
           const response = await refreshToken();
 
           localStorage.setItem("accessToken", response.accessToken);
-
           localStorage.setItem("refreshToken", response.refreshToken);
 
           console.log("Token refreshed");
@@ -62,9 +58,31 @@ function App() {
     return () => clearInterval(interval);
   }, [isAuthenticated]);
 
+  async function handleLogout() {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout API failed:", error);
+    } finally {
+      localStorage.clear();
+      setIsAuthenticated(false);
+    }
+  }
+
   return (
     <div className="app-container">
-      <header className="header">ממשק ניהול תו הזהב למלונות</header>
+      <header className="header">
+        <span>ממשק ניהול תו הזהב למלונות</span>
+
+        {isAuthenticated && (
+          <button
+            onClick={handleLogout}
+            className="logout-button"
+          >
+            התנתקות
+          </button>
+        )}
+      </header>
 
       <div className="main-content">
         {isAuthenticated ? (
