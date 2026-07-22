@@ -7,15 +7,12 @@ import {
   blockUser,
   unblockUser,
 } from "../services/userService";
+import { getOrganization } from "../services/organizationService";
+import { getBranches } from "../services/branchService";
 
-function UsersPage({
-  organization,
-  branch,
-  onBack,
-}) {
+function UsersPage({ organization, branch, onBack }) {
   const [users, setUsers] = useState([]);
   const [editingUserId, setEditingUserId] = useState(null);
-
   const [editForm, setEditForm] = useState({
     userName: "",
     roleId: "",
@@ -24,6 +21,8 @@ function UsersPage({
     phone: "",
     email: "",
   });
+  const [organizations, setOrganizations] = useState([]);
+  const [branches, setBranches] = useState([]);
 
   async function fetchUsers() {
     try {
@@ -32,12 +31,10 @@ function UsersPage({
       let filtered = data;
 
       if (branch) {
-        filtered = filtered.filter(
-          (user) => user.branchId === branch.id
-        );
+        filtered = filtered.filter((user) => user.branchId === branch.id);
       } else if (organization) {
         filtered = filtered.filter(
-          (user) => user.organizationId === organization.id
+          (user) => user.organizationId === organization.id,
         );
       }
 
@@ -48,8 +45,50 @@ function UsersPage({
   }
 
   useEffect(() => {
-    fetchUsers();
+    async function loadAll() {
+      try {
+        const [usersData, orgsData, branchesData] = await Promise.all([
+          getUsers(),
+          getOrganization(),
+          getBranches(),
+        ]);
+
+        let filteredUsers = usersData;
+
+        if (branch) {
+          filteredUsers = filteredUsers.filter(
+            (user) => user.branchId === branch.id,
+          );
+        } else if (organization) {
+          filteredUsers = filteredUsers.filter(
+            (user) => user.organizationId === organization.id,
+          );
+        }
+
+        setUsers(filteredUsers);
+        setOrganizations(orgsData);
+        setBranches(branchesData);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      }
+    }
+
+    loadAll();
   }, [organization?.id, branch?.id]);
+
+  function getOrganizationName(organizationId) {
+    if (!organizationId) return "-";
+
+    const org = organizations.find((o) => o.id === organizationId);
+    return org ? org.name : `#${organizationId}`;
+  }
+
+  function getBranchName(branchId) {
+    if (!branchId) return "-";
+
+    const br = branches.find((b) => b.id === branchId);
+    return br ? br.name : `#${branchId}`;
+  }
 
   function handleEdit(user) {
     setEditingUserId(user.id);
@@ -86,7 +125,7 @@ function UsersPage({
         editForm.branchId === "" ? null : Number(editForm.branchId),
         editForm.organizationId === "" ? null : Number(editForm.organizationId),
         editForm.phone,
-        editForm.email
+        editForm.email,
       );
 
       await fetchUsers();
@@ -98,6 +137,7 @@ function UsersPage({
   }
 
   async function handleToggleUserStatus(user) {
+    console.log("Toggle status clicked for user:", user);
     try {
       if (user.isActive) {
         await deactivateUser(user.id);
@@ -231,7 +271,7 @@ function UsersPage({
                     }
                   />
                 ) : (
-                  user.role ?? user.roleId ?? "-"
+                  (user.role ?? user.roleId ?? "-")
                 )}
               </td>
 
@@ -248,7 +288,7 @@ function UsersPage({
                     }
                   />
                 ) : (
-                  user.organizationId ?? "-"
+                  getOrganizationName(user.organizationId)
                 )}
               </td>
 
@@ -265,7 +305,7 @@ function UsersPage({
                     }
                   />
                 ) : (
-                  user.branchId ?? "-"
+                  getBranchName(user.branchId)
                 )}
               </td>
 
@@ -282,7 +322,7 @@ function UsersPage({
                     }
                   />
                 ) : (
-                  user.phone ?? "-"
+                  (user.phone ?? "-")
                 )}
               </td>
 
@@ -299,7 +339,7 @@ function UsersPage({
                     }
                   />
                 ) : (
-                  user.email ?? "-"
+                  (user.email ?? "-")
                 )}
               </td>
 
