@@ -15,3 +15,16 @@ export async function verifyOtp(userName, otpCode){
     });
     return response.data;
 }
+
+export async function refreshToken() {
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    const response = await api.post(
+        "/api/Auth/refresh",
+        {
+            refreshToken,
+        }
+    );
+
+    return response.data;
+}
