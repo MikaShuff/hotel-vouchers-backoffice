@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { refreshToken, logout } from "./services/authService";
 import Navigator from "./components/Navigator";
 import Workspace from "./components/Workspace";
-import "./App.css";
+import styles from "./App.module.css";
 import Login from "./components/Login";
 
 function App() {
@@ -19,10 +19,8 @@ function App() {
 
       try {
         const response = await refreshToken();
-
         localStorage.setItem("accessToken", response.accessToken);
         localStorage.setItem("refreshToken", response.refreshToken);
-
         setIsAuthenticated(true);
       } catch {
         localStorage.clear();
@@ -42,10 +40,8 @@ function App() {
       async () => {
         try {
           const response = await refreshToken();
-
           localStorage.setItem("accessToken", response.accessToken);
           localStorage.setItem("refreshToken", response.refreshToken);
-
           console.log("Token refreshed");
         } catch {
           localStorage.clear();
@@ -70,28 +66,24 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <header className="header">
+    <div className={styles.appContainer}>
+      <header className={styles.header}>
         <span>ממשק ניהול תו הזהב למלונות</span>
 
         {isAuthenticated && (
-          <button
-            onClick={handleLogout}
-            className="logout-button"
-          >
+          <button onClick={handleLogout} className={styles.logoutButton}>
             התנתקות
           </button>
         )}
       </header>
 
-      <div className="main-content">
+      <div className={styles.mainContent}>
         {isAuthenticated ? (
           <>
             <Navigator
               selectedPage={selectedPage}
               setSelectedPage={setSelectedPage}
             />
-
             <Workspace selectedPage={selectedPage} />
           </>
         ) : (

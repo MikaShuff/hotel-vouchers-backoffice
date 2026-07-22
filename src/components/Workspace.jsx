@@ -1,11 +1,12 @@
 import Dashboard from "./Dashboard";
 import OrganizationsPage from "../pages/OrganizationsPage";
 import UsersPage from "../pages/UsersPage";
+import styles from "./Workspace.module.css";
 
 function Workspace({ selectedPage }) {
   if (selectedPage === "Dashboard") {
     return (
-      <div className="workspace">
+      <div className={styles.workspace}>
         <Dashboard />
       </div>
     );
@@ -13,7 +14,7 @@ function Workspace({ selectedPage }) {
 
   if (selectedPage === "ארגונים") {
     return (
-      <div className="workspace">
+      <div className={styles.workspace}>
         <OrganizationsPage />
       </div>
     );
@@ -21,14 +22,14 @@ function Workspace({ selectedPage }) {
 
   if (selectedPage === "משתמשי מערכת") {
     return (
-      <div className="workspace">
+      <div className={styles.workspace}>
         <UsersPage />
       </div>
     );
   }
 
   return (
-    <div className="workspace">
+    <div className={styles.workspace}>
       <h2>{selectedPage}</h2>
       <p>זה מסך {selectedPage}</p>
     </div>

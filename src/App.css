@@ -39,43 +39,12 @@
   display: flex;
 }
 
-.navigator {
-  width: 260px;
-
-  background: #f4f4f4;
-
-  border-right: 1px solid #ddd;
-
-  padding: 20px;
-}
-
 .workspace {
   flex: 1;
 
   padding: 20px;
 }
 
-/* Menu */
-.menu {
-  list-style: none;
-  margin-top: 20px;
-}
-
-.menu li {
-  padding: 12px;
-  cursor: pointer;
-  border-radius: 6px;
-}
-
-.menu li:hover {
-  background-color: #e3f2fd;
-  color:#1976d2;
-}
-
-.active-menu {
-  background-color: #1976d2;
-  color: white;
-}
 
 /* Workspace - Table */
 .data-table {
