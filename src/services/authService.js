@@ -1,8 +1,9 @@
 import api from "./api";
 
-export async function sendOtp(userName, phoneNumber) {
+export async function sendOtp(userName, email, phoneNumber) {
     const response = await api.post("/api/Auth/send-otp", {
         userName,
+        email,
         phoneNumber,
     });
     return response.data;
@@ -30,11 +31,6 @@ export async function refreshToken() {
 }
 
 export async function logout() {
-    const savedRefreshToken = localStorage.getItem("refreshToken");
-
-    const response = await api.post("/api/Auth/logout", {
-        refreshToken: savedRefreshToken,
-    });
-
+    const response = await api.post("/api/Auth/logout");
     return response.data;
 }

@@ -27,7 +27,6 @@ function UsersPage({ organization, branch, onBack }) {
   async function fetchUsers() {
     try {
       const data = await getUsers();
-
       let filtered = data;
 
       if (branch) {
@@ -78,21 +77,18 @@ function UsersPage({ organization, branch, onBack }) {
 
   function getOrganizationName(organizationId) {
     if (!organizationId) return "-";
-
     const org = organizations.find((o) => o.id === organizationId);
     return org ? org.name : `#${organizationId}`;
   }
 
   function getBranchName(branchId) {
     if (!branchId) return "-";
-
     const br = branches.find((b) => b.id === branchId);
     return br ? br.name : `#${branchId}`;
   }
 
   function handleEdit(user) {
     setEditingUserId(user.id);
-
     setEditForm({
       userName: user.userName ?? "",
       roleId: user.roleId ?? "",
@@ -105,7 +101,6 @@ function UsersPage({ organization, branch, onBack }) {
 
   function handleCancelEdit() {
     setEditingUserId(null);
-
     setEditForm({
       userName: "",
       roleId: "",
@@ -127,7 +122,6 @@ function UsersPage({ organization, branch, onBack }) {
         editForm.phone,
         editForm.email,
       );
-
       await fetchUsers();
       handleCancelEdit();
     } catch (error) {
@@ -137,14 +131,12 @@ function UsersPage({ organization, branch, onBack }) {
   }
 
   async function handleToggleUserStatus(user) {
-    console.log("Toggle status clicked for user:", user);
     try {
       if (user.isActive) {
         await deactivateUser(user.id);
       } else {
         await activateUser(user.id);
       }
-
       await fetchUsers();
     } catch (error) {
       console.error("Error changing user status:", error);
@@ -159,10 +151,8 @@ function UsersPage({ organization, branch, onBack }) {
       } else {
         const oneHourLater = new Date();
         oneHourLater.setHours(oneHourLater.getHours() + 1);
-
         await blockUser(user.id, oneHourLater.toISOString());
       }
-
       await fetchUsers();
     } catch (error) {
       console.error("Error changing user block:", error);
@@ -177,11 +167,12 @@ function UsersPage({ organization, branch, onBack }) {
           <button onClick={onBack} className="link-button">
             ← סניפים
           </button>
-          <span> / </span>
+          <span>/</span>
           <span>{organization.name}</span>
-          <span> / </span>
+          <span>/</span>
           <span>{branch.name}</span>
-          <span> / משתמשים</span>
+          <span>/</span>
+          <span>משתמשים</span>
         </div>
       );
     }
@@ -192,9 +183,10 @@ function UsersPage({ organization, branch, onBack }) {
           <button onClick={onBack} className="link-button">
             ← ארגונים
           </button>
-          <span> / </span>
+          <span>/</span>
           <span>{organization.name}</span>
-          <span> / משתמשים</span>
+          <span>/</span>
+          <span>משתמשים</span>
         </div>
       );
     }
@@ -203,14 +195,8 @@ function UsersPage({ organization, branch, onBack }) {
   }
 
   function renderTitle() {
-    if (branch) {
-      return `משתמשי ${branch.name}`;
-    }
-
-    if (organization) {
-      return `משתמשי ${organization.name}`;
-    }
-
+    if (branch) return `משתמשי ${branch.name}`;
+    if (organization) return `משתמשי ${organization.name}`;
     return "משתמשי מערכת";
   }
 

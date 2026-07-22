@@ -39,7 +39,6 @@ function OrganizationsPage() {
 
   function handleEdit(org) {
     setEditingOrganizationId(org.id);
-
     setEditForm({
       name: org.name,
       commission: org.commission ?? "",
@@ -51,7 +50,6 @@ function OrganizationsPage() {
 
   function handleCancelEdit() {
     setEditingOrganizationId(null);
-
     setEditForm({
       name: "",
       commission: "",
@@ -69,9 +67,7 @@ function OrganizationsPage() {
         Number(editForm.commission),
         editForm.allowCancel,
         editForm.updateMaxWithdrawAmount,
-        editForm.maxWithdrawAmount === ""
-          ? null
-          : Number(editForm.maxWithdrawAmount),
+        editForm.maxWithdrawAmount === "" ? null : Number(editForm.maxWithdrawAmount),
       );
 
       await fetchOrganization();
@@ -89,7 +85,6 @@ function OrganizationsPage() {
       } else {
         await activateOrganization(org.id);
       }
-
       await fetchOrganization();
     } catch (error) {
       console.error("Error changing organization status:", error);
@@ -97,175 +92,197 @@ function OrganizationsPage() {
     }
   }
 
+  if (selectedOrganizationForUsers) {
+    return (
+      <UsersPage
+        organization={selectedOrganizationForUsers}
+        onBack={() => setSelectedOrganizationForUsers(null)}
+      />
+    );
+  }
+
+  if (selectedOrganizationForBranches) {
+    return (
+      <BranchesPage
+        organization={selectedOrganizationForBranches}
+        onBack={() => setSelectedOrganizationForBranches(null)}
+      />
+    );
+  }
+
   return (
     <div>
-      {selectedOrganizationForUsers ? (
-        <UsersPage
-          organization={selectedOrganizationForUsers}
-          onBack={() => setSelectedOrganizationForUsers(null)}
+      <div className="page-header">
+        <h2 className="page-title">ניהול ארגונים</h2>
+        <button
+          className="btn-primary"
+          onClick={() => setShowCreateForm(true)}
+        >
+          + הוסף ארגון
+        </button>
+      </div>
+
+      {showCreateForm && (
+        <CreateOrganizationForm
+          onCreated={() => {
+            fetchOrganization();
+            setShowCreateForm(false);
+          }}
+          onCancel={() => setShowCreateForm(false)}
         />
-      ) : selectedOrganizationForBranches ? (
-        <BranchesPage
-          organization={selectedOrganizationForBranches}
-          onBack={() => setSelectedOrganizationForBranches(null)}
-        />
-      ) : (
-        <>
-          <h2>ניהול ארגונים</h2>
-
-          <button onClick={() => setShowCreateForm(true)}>הוסף ארגון</button>
-
-          {showCreateForm && (
-            <CreateOrganizationForm
-              onCreated={() => {
-                fetchOrganization();
-                setShowCreateForm(false);
-              }}
-            />
-          )}
-
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>מזהה</th>
-                <th>שם לקוח</th>
-                <th>עמלה</th>
-                <th>אפשר ביטול</th>
-                <th>סכום משיכה מקסימלי</th>
-                <th>סטטוס</th>
-                <th>פעולות</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {organization.map((org) => (
-                <tr key={org.id}>
-                  <td>{org.id}</td>
-
-                  <td>
-                    {editingOrganizationId === org.id ? (
-                      <input
-                        type="text"
-                        value={editForm.name}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                    ) : (
-                      org.name
-                    )}
-                  </td>
-
-                  <td>
-                    {editingOrganizationId === org.id ? (
-                      <input
-                        type="number"
-                        value={editForm.commission}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            commission: e.target.value,
-                          })
-                        }
-                      />
-                    ) : (
-                      org.commission
-                    )}
-                  </td>
-
-                  <td>
-                    {editingOrganizationId === org.id ? (
-                      <input
-                        type="checkbox"
-                        checked={editForm.allowCancel}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            allowCancel: e.target.checked,
-                          })
-                        }
-                      />
-                    ) : org.allowCancel ? (
-                      "כן"
-                    ) : (
-                      "לא"
-                    )}
-                  </td>
-
-                  <td>
-                    {editingOrganizationId === org.id ? (
-                      <input
-                        type="number"
-                        value={editForm.maxWithdrawAmount}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            maxWithdrawAmount: e.target.value,
-                            updateMaxWithdrawAmount: true,
-                          })
-                        }
-                      />
-                    ) : (
-                      (org.maxWithdrawAmount ?? "-")
-                    )}
-                  </td>
-
-                  <td>{org.isActive ? "פעיל" : "לא פעיל"}</td>
-
-                  <td>
-                    {editingOrganizationId === org.id ? (
-                      <>
-                        <button
-                          onClick={() => handleUpdateOrganization(org.id)}
-                        >
-                          שמור
-                        </button>
-
-                        <button onClick={handleCancelEdit}>ביטול</button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => handleEdit(org)}>ערוך</button>
-
-                        {org.isActive ? (
-                          <button
-                            onClick={() => handleToggleOrganizationStatus(org)}
-                          >
-                            השבת
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleToggleOrganizationStatus(org)}
-                          >
-                            הפעל
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => {
-                            setSelectedOrganizationForBranches(org);
-                          }}
-                        >
-                          סניפים
-                        </button>
-
-                        <button
-                          onClick={() => setSelectedOrganizationForUsers(org)}
-                        >
-                          משתמשים
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
       )}
+
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>מזהה</th>
+            <th>שם לקוח</th>
+            <th>עמלה</th>
+            <th>אפשר ביטול</th>
+            <th>סכום משיכה מקסימלי</th>
+            <th>סטטוס</th>
+            <th>פעולות</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {organization.map((org) => (
+            <tr key={org.id}>
+              <td>{org.id}</td>
+
+              <td>
+                {editingOrganizationId === org.id ? (
+                  <input
+                    className="inline-input"
+                    type="text"
+                    value={editForm.name}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, name: e.target.value })
+                    }
+                  />
+                ) : (
+                  org.name
+                )}
+              </td>
+
+              <td>
+                {editingOrganizationId === org.id ? (
+                  <input
+                    className="inline-input"
+                    type="number"
+                    value={editForm.commission}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, commission: e.target.value })
+                    }
+                  />
+                ) : (
+                  org.commission
+                )}
+              </td>
+
+              <td>
+                {editingOrganizationId === org.id ? (
+                  <input
+                    type="checkbox"
+                    checked={editForm.allowCancel}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, allowCancel: e.target.checked })
+                    }
+                  />
+                ) : org.allowCancel ? (
+                  "כן"
+                ) : (
+                  "לא"
+                )}
+              </td>
+
+              <td>
+                {editingOrganizationId === org.id ? (
+                  <input
+                    className="inline-input"
+                    type="number"
+                    value={editForm.maxWithdrawAmount}
+                    onChange={(e) =>
+                      setEditForm({
+                        ...editForm,
+                        maxWithdrawAmount: e.target.value,
+                        updateMaxWithdrawAmount: true,
+                      })
+                    }
+                  />
+                ) : (
+                  org.maxWithdrawAmount ?? "-"
+                )}
+              </td>
+
+              <td>
+                {org.isActive ? (
+                  <span className="badge-active">פעיל</span>
+                ) : (
+                  <span className="badge-inactive">לא פעיל</span>
+                )}
+              </td>
+
+              <td>
+                <div className="action-buttons">
+                  {editingOrganizationId === org.id ? (
+                    <>
+                      <button
+                        className="btn-save"
+                        onClick={() => handleUpdateOrganization(org.id)}
+                      >
+                        שמור
+                      </button>
+                      <button className="btn-secondary" onClick={handleCancelEdit}>
+                        ביטול
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="btn-edit"
+                        onClick={() => handleEdit(org)}
+                      >
+                        ערוך
+                      </button>
+
+                      {org.isActive ? (
+                        <button
+                          className="btn-danger"
+                          onClick={() => handleToggleOrganizationStatus(org)}
+                        >
+                          השבת
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-success"
+                          onClick={() => handleToggleOrganizationStatus(org)}
+                        >
+                          הפעל
+                        </button>
+                      )}
+
+                      <button
+                        className="btn-secondary"
+                        onClick={() => setSelectedOrganizationForBranches(org)}
+                      >
+                        סניפים
+                      </button>
+
+                      <button
+                        className="btn-secondary"
+                        onClick={() => setSelectedOrganizationForUsers(org)}
+                      >
+                        משתמשים
+                      </button>
+                    </>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

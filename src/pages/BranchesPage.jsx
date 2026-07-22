@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import {
   getBranches,
-  createBranch,
   updateBranch,
   activateBranch,
   deactivateBranch,
 } from "../services/branchService";
+import CreateBranchForm from "../forms/CreateBranchForm";
 import UsersPage from "./UsersPage";
 
 function BranchesPage({ organization, onBack }) {
@@ -13,12 +13,6 @@ function BranchesPage({ organization, onBack }) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingBranchId, setEditingBranchId] = useState(null);
   const [selectedBranchForUsers, setSelectedBranchForUsers] = useState(null);
-
-  const [createForm, setCreateForm] = useState({
-    name: "",
-    terminalUniqueIdentifier: "",
-    maxWithdrawAmount: "",
-  });
 
   const [editForm, setEditForm] = useState({
     name: "",
@@ -30,11 +24,9 @@ function BranchesPage({ organization, onBack }) {
   async function fetchBranches() {
     try {
       const data = await getBranches();
-
       const filtered = data.filter(
         (branch) => branch.organizationId === organization.id,
       );
-
       setBranches(filtered);
     } catch (error) {
       console.error("Error fetching branches:", error);
@@ -45,35 +37,8 @@ function BranchesPage({ organization, onBack }) {
     fetchBranches();
   }, [organization.id]);
 
-  async function handleCreateBranch() {
-    try {
-      await createBranch(
-        createForm.name,
-        organization.id,
-        createForm.terminalUniqueIdentifier,
-        createForm.maxWithdrawAmount === ""
-          ? null
-          : Number(createForm.maxWithdrawAmount),
-      );
-
-      await fetchBranches();
-
-      setShowCreateForm(false);
-
-      setCreateForm({
-        name: "",
-        terminalUniqueIdentifier: "",
-        maxWithdrawAmount: "",
-      });
-    } catch (error) {
-      console.error("Error creating branch:", error);
-      alert("שגיאה ביצירת הסניף");
-    }
-  }
-
   function handleEdit(branch) {
     setEditingBranchId(branch.id);
-
     setEditForm({
       name: branch.name,
       terminalUniqueIdentifier: branch.terminalUniqueIdentifier ?? "",
@@ -84,7 +49,6 @@ function BranchesPage({ organization, onBack }) {
 
   function handleCancelEdit() {
     setEditingBranchId(null);
-
     setEditForm({
       name: "",
       terminalUniqueIdentifier: "",
@@ -100,11 +64,8 @@ function BranchesPage({ organization, onBack }) {
         editForm.name,
         editForm.terminalUniqueIdentifier,
         editForm.updateMaxWithdrawAmount,
-        editForm.maxWithdrawAmount === ""
-          ? null
-          : Number(editForm.maxWithdrawAmount),
+        editForm.maxWithdrawAmount === "" ? null : Number(editForm.maxWithdrawAmount),
       );
-
       await fetchBranches();
       handleCancelEdit();
     } catch (error) {
@@ -120,7 +81,6 @@ function BranchesPage({ organization, onBack }) {
       } else {
         await activateBranch(branch.id);
       }
-
       await fetchBranches();
     } catch (error) {
       console.error("Error changing branch status:", error);
@@ -144,70 +104,31 @@ function BranchesPage({ organization, onBack }) {
         <button onClick={onBack} className="link-button">
           ← ארגונים
         </button>
-        <span> / </span>
+        <span>/</span>
         <span>{organization.name}</span>
-        <span> / סניפים</span>
+        <span>/</span>
+        <span>סניפים</span>
       </div>
 
-      <h2>סניפי {organization.name}</h2>
-
-      <button onClick={() => setShowCreateForm(true)}>הוסף סניף</button>
+      <div className="page-header">
+        <h2 className="page-title">סניפי {organization.name}</h2>
+        <button
+          className="btn-primary"
+          onClick={() => setShowCreateForm(true)}
+        >
+          + הוסף סניף
+        </button>
+      </div>
 
       {showCreateForm && (
-        <div className="create-branch-form">
-          <h3>הוספת סניף</h3>
-
-          <input
-            type="text"
-            placeholder="שם סניף"
-            value={createForm.name}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                name: e.target.value,
-              })
-            }
-          />
-
-          <input
-            type="text"
-            placeholder="מזהה מסוף"
-            value={createForm.terminalUniqueIdentifier}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                terminalUniqueIdentifier: e.target.value,
-              })
-            }
-          />
-
-          <input
-            type="number"
-            placeholder="סכום משיכה מקסימלי"
-            value={createForm.maxWithdrawAmount}
-            onChange={(e) =>
-              setCreateForm({
-                ...createForm,
-                maxWithdrawAmount: e.target.value,
-              })
-            }
-          />
-
-          <button onClick={handleCreateBranch}>שמור</button>
-
-          <button
-            onClick={() => {
-              setShowCreateForm(false);
-              setCreateForm({
-                name: "",
-                terminalUniqueIdentifier: "",
-                maxWithdrawAmount: "",
-              });
-            }}
-          >
-            ביטול
-          </button>
-        </div>
+        <CreateBranchForm
+          organization={organization}
+          onCreated={() => {
+            fetchBranches();
+            setShowCreateForm(false);
+          }}
+          onCancel={() => setShowCreateForm(false)}
+        />
       )}
 
       <table className="data-table">
@@ -230,13 +151,11 @@ function BranchesPage({ organization, onBack }) {
               <td>
                 {editingBranchId === branch.id ? (
                   <input
+                    className="inline-input"
                     type="text"
                     value={editForm.name}
                     onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        name: e.target.value,
-                      })
+                      setEditForm({ ...editForm, name: e.target.value })
                     }
                   />
                 ) : (
@@ -247,6 +166,7 @@ function BranchesPage({ organization, onBack }) {
               <td>
                 {editingBranchId === branch.id ? (
                   <input
+                    className="inline-input"
                     type="text"
                     value={editForm.terminalUniqueIdentifier}
                     onChange={(e) =>
@@ -257,13 +177,14 @@ function BranchesPage({ organization, onBack }) {
                     }
                   />
                 ) : (
-                  (branch.terminalUniqueIdentifier ?? "-")
+                  branch.terminalUniqueIdentifier ?? "-"
                 )}
               </td>
 
               <td>
                 {editingBranchId === branch.id ? (
                   <input
+                    className="inline-input"
                     type="number"
                     value={editForm.maxWithdrawAmount}
                     onChange={(e) =>
@@ -275,40 +196,69 @@ function BranchesPage({ organization, onBack }) {
                     }
                   />
                 ) : (
-                  (branch.maxWithdrawAmount ?? "-")
+                  branch.maxWithdrawAmount ?? "-"
                 )}
               </td>
 
-              <td>{branch.isActive ? "פעיל" : "לא פעיל"}</td>
+              <td>
+                {branch.isActive ? (
+                  <span className="badge-active">פעיל</span>
+                ) : (
+                  <span className="badge-inactive">לא פעיל</span>
+                )}
+              </td>
 
               <td>
-                {editingBranchId === branch.id ? (
-                  <>
-                    <button onClick={() => handleUpdateBranch(branch.id)}>
-                      שמור
-                    </button>
-
-                    <button onClick={handleCancelEdit}>ביטול</button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={() => handleEdit(branch)}>ערוך</button>
-
-                    {branch.isActive ? (
-                      <button onClick={() => handleToggleBranchStatus(branch)}>
-                        השבת
+                <div className="action-buttons">
+                  {editingBranchId === branch.id ? (
+                    <>
+                      <button
+                        className="btn-save"
+                        onClick={() => handleUpdateBranch(branch.id)}
+                      >
+                        שמור
                       </button>
-                    ) : (
-                      <button onClick={() => handleToggleBranchStatus(branch)}>
-                        הפעל
+                      <button
+                        className="btn-secondary"
+                        onClick={handleCancelEdit}
+                      >
+                        ביטול
                       </button>
-                    )}
-                  </>
-                )}
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="btn-edit"
+                        onClick={() => handleEdit(branch)}
+                      >
+                        ערוך
+                      </button>
 
-                <button onClick={() => setSelectedBranchForUsers(branch)}>
-                  משתמשים
-                </button>
+                      {branch.isActive ? (
+                        <button
+                          className="btn-danger"
+                          onClick={() => handleToggleBranchStatus(branch)}
+                        >
+                          השבת
+                        </button>
+                      ) : (
+                        <button
+                          className="btn-success"
+                          onClick={() => handleToggleBranchStatus(branch)}
+                        >
+                          הפעל
+                        </button>
+                      )}
+
+                      <button
+                        className="btn-secondary"
+                        onClick={() => setSelectedBranchForUsers(branch)}
+                      >
+                        משתמשים
+                      </button>
+                    </>
+                  )}
+                </div>
               </td>
             </tr>
           ))}

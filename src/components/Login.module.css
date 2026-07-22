@@ -1,0 +1,155 @@
+.loginWrapper {
+  min-height: calc(100vh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f7fa;
+  padding: 20px;
+  width: 100%;
+}
+
+.loginContainer {
+  width: 100%;
+  max-width: 380px;
+  padding: 40px 32px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  margin: 0 0 8px 0;
+  text-align: center;
+  color: #1976d2;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin: 0 0 16px 0;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.label {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: -8px;
+  font-weight: 500;
+}
+
+.input {
+  padding: 12px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.15s;
+  background: #fafafa;
+  font-family: inherit;
+}
+
+.input:focus {
+  border-color: #1976d2;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}
+
+.button {
+  padding: 12px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  font-family: inherit;
+}
+
+.button:hover {
+  background: #1565c0;
+}
+
+.buttonSecondary {
+  padding: 12px;
+  background: white;
+  color: #1976d2;
+  border: 1px solid #1976d2;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.buttonSecondary:hover {
+  background: #f0f7ff;
+}
+
+.divider {
+  height: 1px;
+  background: #eee;
+  margin: 8px 0;
+}
+
+.successMessage {
+  padding: 10px 12px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.errorMessage {
+  padding: 10px 12px;
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.toggleGroup {
+  display: flex;
+  gap: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.toggleButton {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  color: #666;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.toggleButton:hover {
+  background: #f0f0f0;
+}
+
+.toggleButtonActive {
+  background: #1976d2;
+  color: white;
+}
+
+.toggleButtonActive:hover {
+  background: #1976d2;
+}
