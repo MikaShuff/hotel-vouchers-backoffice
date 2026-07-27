@@ -1,11 +1,11 @@
 import styles from "./Navigator.module.css";
+import appLogo from "../assets/app.png";
 
 function Navigator({ selectedPage, setSelectedPage }) {
   const menuItems = ["Dashboard", "ארגונים", "משתמשי מערכת", "תמיכה"];
 
   return (
     <div className={styles.navigator}>
-      <h3 className={styles.title}>ניווט</h3>
 
       <ul className={styles.menu}>
         {menuItems.map((item) => (
@@ -22,6 +22,10 @@ function Navigator({ selectedPage, setSelectedPage }) {
           </li>
         ))}
       </ul>
+
+      <div className={styles.logoContainer}>
+        <img src={appLogo} alt="לוגו המערכת" className={styles.logo} />
+      </div>
     </div>
   );
 }

@@ -27,7 +27,7 @@
 .link-button {
   background: none;
   border: none;
-  color: #1976d2;
+  color: #d81f2a;
   cursor: pointer;
   padding: 0;
   font-size: 13px;
@@ -42,7 +42,7 @@
 /* Buttons */
 .btn-primary {
   padding: 8px 16px;
-  background: #1976d2;
+  background: #d81f2a;
   color: white;
   border: none;
   border-radius: 4px;
@@ -53,7 +53,7 @@
 }
 
 .btn-primary:hover {
-  background: #1565c0;
+  background: #a5121b;
 }
 
 .btn-secondary {
@@ -75,7 +75,7 @@
 
 .btn-edit {
   padding: 6px 12px;
-  background: #1976d2;
+  background: #d81f2a;
   color: white;
   border: none;
   border-radius: 4px;
@@ -86,7 +86,7 @@
 }
 
 .btn-edit:hover {
-  background: #1565c0;
+  background: #a5121b;
 }
 
 .btn-save {
@@ -147,7 +147,7 @@
 /* Inline inputs in table */
 .inline-input {
   padding: 6px 8px;
-  border: 1px solid #1976d2;
+  border: 1px solid #d81f2a;
   border-radius: 4px;
   font-size: 13px;
   font-family: inherit;
@@ -157,7 +157,7 @@
 }
 
 .inline-input:focus {
-  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+  box-shadow: 0 0 0 2px rgba(216, 31, 42, 0.1);
 }
 
 /* Status badges */
@@ -221,9 +221,9 @@
 }
 
 .filter-input:focus {
-  border-color: #1976d2;
+  border-color: #d81f2a;
   background: white;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
+  box-shadow: 0 0 0 3px rgba(216, 31, 42, 0.12);
 }
 
 .filter-input::placeholder {
@@ -251,19 +251,19 @@
 }
 
 .filter-select:focus {
-  border-color: #1976d2;
+  border-color: #d81f2a;
   background: white;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
+  box-shadow: 0 0 0 3px rgba(216, 31, 42, 0.12);
 }
 
 /* מונה תוצאות */
 .filter-count {
   margin-right: auto;
   font-size: 13px;
-  color: #1976d2;
+  color: #d81f2a;
   font-weight: 600;
   padding: 7px 14px;
-  background: #e8f2fd;
+  background: #fdecec;
   border-radius: 20px;
   white-space: nowrap;
 }
