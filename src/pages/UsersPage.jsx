@@ -9,6 +9,7 @@ import {
 } from "../services/userService";
 import { getOrganization } from "../services/organizationService";
 import { getBranches } from "../services/branchService";
+import CreateUserForm from "../forms/CreateUserForm";
 
 function UsersPage({ organization, branch, onBack }) {
   const [users, setUsers] = useState([]);
@@ -23,6 +24,15 @@ function UsersPage({ organization, branch, onBack }) {
   });
   const [organizations, setOrganizations] = useState([]);
   const [branches, setBranches] = useState([]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
+  // ----- Filters -----
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [blockFilter, setBlockFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [orgFilter, setOrgFilter] = useState("all");
+  const [branchFilter, setBranchFilter] = useState("all");
 
   async function fetchUsers() {
     try {
@@ -160,6 +170,15 @@ function UsersPage({ organization, branch, onBack }) {
     }
   }
 
+  function handleResetFilters() {
+    setSearchText("");
+    setStatusFilter("all");
+    setBlockFilter("all");
+    setRoleFilter("all");
+    setOrgFilter("all");
+    setBranchFilter("all");
+  }
+
   function renderBreadcrumb() {
     if (branch && organization) {
       return (
@@ -200,12 +219,163 @@ function UsersPage({ organization, branch, onBack }) {
     return "משתמשי מערכת";
   }
 
+  const uniqueRoles = [
+    ...new Set(users.map((u) => u.roleId).filter((r) => r != null)),
+  ];
+
+  const filteredUsers = users.filter((user) => {
+    if (searchText.trim()) {
+      const search = searchText.trim().toLowerCase();
+      const matchesSearch =
+        (user.userName ?? "").toLowerCase().includes(search) ||
+        (user.phone ?? "").toLowerCase().includes(search) ||
+        (user.email ?? "").toLowerCase().includes(search);
+
+      if (!matchesSearch) return false;
+    }
+
+    if (statusFilter === "active" && !user.isActive) return false;
+    if (statusFilter === "inactive" && user.isActive) return false;
+
+    if (blockFilter === "blocked" && !user.lockedUntil) return false;
+    if (blockFilter === "notBlocked" && user.lockedUntil) return false;
+
+    if (roleFilter !== "all" && String(user.roleId) !== roleFilter) return false;
+
+    if (orgFilter !== "all" && String(user.organizationId) !== orgFilter)
+      return false;
+
+    if (branchFilter !== "all" && String(user.branchId) !== branchFilter)
+      return false;
+
+    return true;
+  });
+
+  const hasActiveFilters =
+    searchText.trim() !== "" ||
+    statusFilter !== "all" ||
+    blockFilter !== "all" ||
+    roleFilter !== "all" ||
+    orgFilter !== "all" ||
+    branchFilter !== "all";
+
+  const showOrgFilter = !organization && !branch;
+  const showBranchFilter = !branch;
+
+  // רשימת הסניפים לתצוגה בסינון - מסוננת לפי הארגון שנבחר
+  const branchesForFilter =
+    orgFilter !== "all"
+      ? branches.filter((br) => String(br.organizationId) === orgFilter)
+      : branches;
+
   return (
     <div>
       {renderBreadcrumb()}
 
       <div className="page-header">
         <h2 className="page-title">{renderTitle()}</h2>
+        <button className="btn-primary" onClick={() => setShowCreateForm(true)}>
+          + הוסף משתמש
+        </button>
+      </div>
+
+      {showCreateForm && (
+        <CreateUserForm
+          organization={organization}
+          branch={branch}
+          existingUsers={users}
+          onCreated={() => {
+            fetchUsers();
+            setShowCreateForm(false);
+          }}
+          onCancel={() => setShowCreateForm(false)}
+        />
+      )}
+
+      <div className="filter-bar">
+        <input
+          className="filter-input"
+          type="text"
+          placeholder="🔍 חיפוש לפי שם, טלפון או אימייל..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+
+        <select
+          className="filter-select"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="all">כל הסטטוסים</option>
+          <option value="active">פעילים</option>
+          <option value="inactive">לא פעילים</option>
+        </select>
+
+        <select
+          className="filter-select"
+          value={blockFilter}
+          onChange={(e) => setBlockFilter(e.target.value)}
+        >
+          <option value="all">הכל</option>
+          <option value="blocked">חסומים</option>
+          <option value="notBlocked">לא חסומים</option>
+        </select>
+
+        <select
+          className="filter-select"
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+        >
+          <option value="all">כל התפקידים</option>
+          {uniqueRoles.map((roleId) => (
+            <option key={roleId} value={String(roleId)}>
+              תפקיד {roleId}
+            </option>
+          ))}
+        </select>
+
+        {showOrgFilter && (
+          <select
+            className="filter-select"
+            value={orgFilter}
+            onChange={(e) => {
+              setOrgFilter(e.target.value);
+              setBranchFilter("all");
+            }}
+          >
+            <option value="all">כל הארגונים</option>
+            {organizations.map((org) => (
+              <option key={org.id} value={String(org.id)}>
+                {org.name}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {showBranchFilter && (
+          <select
+            className="filter-select"
+            value={branchFilter}
+            onChange={(e) => setBranchFilter(e.target.value)}
+          >
+            <option value="all">כל הסניפים</option>
+            {branchesForFilter.map((br) => (
+              <option key={br.id} value={String(br.id)}>
+                {br.name}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {hasActiveFilters && (
+          <button className="btn-secondary" onClick={handleResetFilters}>
+            נקה סינון
+          </button>
+        )}
+
+        <span className="filter-count">
+          {filteredUsers.length} מתוך {users.length}
+        </span>
       </div>
 
       <table className="data-table">
@@ -225,182 +395,192 @@ function UsersPage({ organization, branch, onBack }) {
         </thead>
 
         <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-
-              <td>
-                {editingUserId === user.id ? (
-                  <input
-                    className="inline-input"
-                    type="text"
-                    value={editForm.userName}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, userName: e.target.value })
-                    }
-                  />
-                ) : (
-                  user.userName
-                )}
-              </td>
-
-              <td>
-                {editingUserId === user.id ? (
-                  <input
-                    className="inline-input"
-                    type="number"
-                    value={editForm.roleId}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, roleId: e.target.value })
-                    }
-                  />
-                ) : (
-                  user.role ?? user.roleId ?? "-"
-                )}
-              </td>
-
-              <td>
-                {editingUserId === user.id ? (
-                  <input
-                    className="inline-input"
-                    type="number"
-                    value={editForm.organizationId}
-                    onChange={(e) =>
-                      setEditForm({
-                        ...editForm,
-                        organizationId: e.target.value,
-                      })
-                    }
-                  />
-                ) : (
-                  getOrganizationName(user.organizationId)
-                )}
-              </td>
-
-              <td>
-                {editingUserId === user.id ? (
-                  <input
-                    className="inline-input"
-                    type="number"
-                    value={editForm.branchId}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, branchId: e.target.value })
-                    }
-                  />
-                ) : (
-                  getBranchName(user.branchId)
-                )}
-              </td>
-
-              <td>
-                {editingUserId === user.id ? (
-                  <input
-                    className="inline-input"
-                    type="text"
-                    value={editForm.phone}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, phone: e.target.value })
-                    }
-                  />
-                ) : (
-                  user.phone ?? "-"
-                )}
-              </td>
-
-              <td>
-                {editingUserId === user.id ? (
-                  <input
-                    className="inline-input"
-                    type="email"
-                    value={editForm.email}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, email: e.target.value })
-                    }
-                  />
-                ) : (
-                  user.email ?? "-"
-                )}
-              </td>
-
-              <td>
-                {user.isActive ? (
-                  <span className="badge-active">פעיל</span>
-                ) : (
-                  <span className="badge-inactive">לא פעיל</span>
-                )}
-              </td>
-
-              <td>
-                {user.lockedUntil ? (
-                  <span className="badge-blocked">חסום</span>
-                ) : (
-                  "-"
-                )}
-              </td>
-
-              <td>
-                <div className="action-buttons">
-                  {editingUserId === user.id ? (
-                    <>
-                      <button
-                        className="btn-save"
-                        onClick={() => handleUpdateUser(user.id)}
-                      >
-                        שמור
-                      </button>
-                      <button
-                        className="btn-secondary"
-                        onClick={handleCancelEdit}
-                      >
-                        ביטול
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        className="btn-edit"
-                        onClick={() => handleEdit(user)}
-                      >
-                        ערוך
-                      </button>
-
-                      {user.isActive ? (
-                        <button
-                          className="btn-danger"
-                          onClick={() => handleToggleUserStatus(user)}
-                        >
-                          השבת
-                        </button>
-                      ) : (
-                        <button
-                          className="btn-success"
-                          onClick={() => handleToggleUserStatus(user)}
-                        >
-                          הפעל
-                        </button>
-                      )}
-
-                      {user.lockedUntil ? (
-                        <button
-                          className="btn-success"
-                          onClick={() => handleToggleUserBlock(user)}
-                        >
-                          שחרר חסימה
-                        </button>
-                      ) : (
-                        <button
-                          className="btn-danger"
-                          onClick={() => handleToggleUserBlock(user)}
-                        >
-                          חסום שעה
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
+          {filteredUsers.length === 0 ? (
+            <tr>
+              <td colSpan="10" className="empty-state">
+                {hasActiveFilters
+                  ? "לא נמצאו משתמשים התואמים לסינון"
+                  : "אין משתמשים להצגה"}
               </td>
             </tr>
-          ))}
+          ) : (
+            filteredUsers.map((user) => (
+              <tr key={user.id}>
+                <td>{user.id}</td>
+
+                <td>
+                  {editingUserId === user.id ? (
+                    <input
+                      className="inline-input"
+                      type="text"
+                      value={editForm.userName}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, userName: e.target.value })
+                      }
+                    />
+                  ) : (
+                    user.userName
+                  )}
+                </td>
+
+                <td>
+                  {editingUserId === user.id ? (
+                    <input
+                      className="inline-input"
+                      type="number"
+                      value={editForm.roleId}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, roleId: e.target.value })
+                      }
+                    />
+                  ) : (
+                    user.role ?? user.roleId ?? "-"
+                  )}
+                </td>
+
+                <td>
+                  {editingUserId === user.id ? (
+                    <input
+                      className="inline-input"
+                      type="number"
+                      value={editForm.organizationId}
+                      onChange={(e) =>
+                        setEditForm({
+                          ...editForm,
+                          organizationId: e.target.value,
+                        })
+                      }
+                    />
+                  ) : (
+                    getOrganizationName(user.organizationId)
+                  )}
+                </td>
+
+                <td>
+                  {editingUserId === user.id ? (
+                    <input
+                      className="inline-input"
+                      type="number"
+                      value={editForm.branchId}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, branchId: e.target.value })
+                      }
+                    />
+                  ) : (
+                    getBranchName(user.branchId)
+                  )}
+                </td>
+
+                <td>
+                  {editingUserId === user.id ? (
+                    <input
+                      className="inline-input"
+                      type="text"
+                      value={editForm.phone}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, phone: e.target.value })
+                      }
+                    />
+                  ) : (
+                    user.phone ?? "-"
+                  )}
+                </td>
+
+                <td>
+                  {editingUserId === user.id ? (
+                    <input
+                      className="inline-input"
+                      type="email"
+                      value={editForm.email}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, email: e.target.value })
+                      }
+                    />
+                  ) : (
+                    user.email ?? "-"
+                  )}
+                </td>
+
+                <td>
+                  {user.isActive ? (
+                    <span className="badge-active">פעיל</span>
+                  ) : (
+                    <span className="badge-inactive">לא פעיל</span>
+                  )}
+                </td>
+
+                <td>
+                  {user.lockedUntil ? (
+                    <span className="badge-blocked">חסום</span>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+
+                <td>
+                  <div className="action-buttons">
+                    {editingUserId === user.id ? (
+                      <>
+                        <button
+                          className="btn-save"
+                          onClick={() => handleUpdateUser(user.id)}
+                        >
+                          שמור
+                        </button>
+                        <button
+                          className="btn-secondary"
+                          onClick={handleCancelEdit}
+                        >
+                          ביטול
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className="btn-edit"
+                          onClick={() => handleEdit(user)}
+                        >
+                          ערוך
+                        </button>
+
+                        {user.isActive ? (
+                          <button
+                            className="btn-danger"
+                            onClick={() => handleToggleUserStatus(user)}
+                          >
+                            השבת
+                          </button>
+                        ) : (
+                          <button
+                            className="btn-success"
+                            onClick={() => handleToggleUserStatus(user)}
+                          >
+                            הפעל
+                          </button>
+                        )}
+
+                        {user.lockedUntil ? (
+                          <button
+                            className="btn-success"
+                            onClick={() => handleToggleUserBlock(user)}
+                          >
+                            שחרר חסימה
+                          </button>
+                        ) : (
+                          <button
+                            className="btn-danger"
+                            onClick={() => handleToggleUserBlock(user)}
+                          >
+                            חסום שעה
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

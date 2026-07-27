@@ -190,3 +190,88 @@
   font-size: 12px;
   font-weight: 500;
 }
+
+/* FILTER BAR */
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  flex-wrap: wrap;
+}
+
+/* שדה החיפוש */
+.filter-input {
+  flex: 1;
+  min-width: 240px;
+  padding: 10px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  background: #f7f8fa;
+  transition: all 0.15s;
+}
+
+.filter-input:focus {
+  border-color: #1976d2;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
+}
+
+.filter-input::placeholder {
+  color: #aaa;
+}
+
+/* תיבות הבחירה */
+.filter-select {
+  padding: 10px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  background: #f7f8fa;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-width: 140px;
+  color: #333;
+}
+
+.filter-select:hover {
+  border-color: #bbb;
+  background: #fff;
+}
+
+.filter-select:focus {
+  border-color: #1976d2;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
+}
+
+/* מונה תוצאות */
+.filter-count {
+  margin-right: auto;
+  font-size: 13px;
+  color: #1976d2;
+  font-weight: 600;
+  padding: 7px 14px;
+  background: #e8f2fd;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* מצב ריק */
+.empty-state {
+  text-align: center !important;
+  color: #999;
+  padding: 40px !important;
+  font-style: italic;
+}
