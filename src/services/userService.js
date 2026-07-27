@@ -10,6 +10,26 @@ export async function getUserById(id) {
     return response.data;
 }
 
+export async function createUser(
+    userName,
+    roleId,
+    branchId,
+    organizationId,
+    phone,
+    email
+) {
+    const response = await api.post("/api/User", {
+        userName,
+        roleId,
+        branchId,
+        organizationId,
+        phone,
+        email,
+    });
+
+    return response.data;
+}
+
 export async function updateUser(
     id,
     userName,
