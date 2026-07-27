@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { sendOtp, verifyOtp } from "../services/authService";
 import styles from "./Login.module.css";
+import appLogo from "../assets/app.png";
 
 function Login({ onLoginSuccess }) {
   const [userName, setUserName] = useState("");
@@ -136,6 +137,8 @@ async function handleSendOtp() {
           כניסה
         </button>
       </div>
+<img src={appLogo} alt="לוגו המערכת" className={styles.cornerLogo} />
+      
     </div>
   );
 }

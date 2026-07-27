@@ -4,6 +4,7 @@ import Navigator from "./components/Navigator";
 import Workspace from "./components/Workspace";
 import styles from "./App.module.css";
 import Login from "./components/Login";
+import headerLogo from "./assets/logo-zahavt.png";
 
 function App() {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
@@ -67,8 +68,11 @@ function App() {
 
   return (
     <div className={styles.appContainer}>
-      <header className={styles.header}>
-        <span>ממשק ניהול תו הזהב למלונות</span>
+          <header className={styles.header}>
+        <div className={styles.headerRight}>
+          <img src={headerLogo} alt="לוגו תו הזהב" className={styles.headerLogo} />
+          <span>ממשק ניהול תו הזהב למלונות</span>
+        </div>
 
         {isAuthenticated && (
           <button onClick={handleLogout} className={styles.logoutButton}>

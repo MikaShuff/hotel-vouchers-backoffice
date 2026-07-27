@@ -48,7 +48,7 @@ function Dashboard() {
   return (
     <div className={styles.dashboard}>
       <div className={styles.welcome}>
-        <h1 className={styles.welcomeTitle}>ברוכים הבאים 👋</h1>{" "}
+        <h1 className={styles.welcomeTitle}>ברוכים הבאים </h1>{" "}
         <p className={styles.welcomeSubtitle}>סקירה כללית של המערכת</p>
       </div>
 

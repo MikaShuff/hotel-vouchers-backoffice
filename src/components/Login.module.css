@@ -23,7 +23,7 @@
 .title {
   margin: 0 0 8px 0;
   text-align: center;
-  color: #1976d2;
+  color: #d81f2a;
   font-size: 24px;
   font-weight: 600;
 }
@@ -54,14 +54,14 @@
 }
 
 .input:focus {
-  border-color: #1976d2;
+  border-color: #d81f2a;
   background: white;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+  box-shadow: 0 0 0 3px rgba(216, 31, 42, 0.1);
 }
 
 .button {
   padding: 12px;
-  background: #1976d2;
+  background: #d81f2a;
   color: white;
   border: none;
   border-radius: 6px;
@@ -73,14 +73,14 @@
 }
 
 .button:hover {
-  background: #1565c0;
+  background: #a5121b;
 }
 
 .buttonSecondary {
   padding: 12px;
   background: white;
-  color: #1976d2;
-  border: 1px solid #1976d2;
+  color: #d81f2a;
+  border: 1px solid #d81f2a;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
@@ -90,7 +90,7 @@
 }
 
 .buttonSecondary:hover {
-  background: #f0f7ff;
+  background: #fff5f5;
 }
 
 .divider {
@@ -146,10 +146,18 @@
 }
 
 .toggleButtonActive {
-  background: #1976d2;
+  background: #d81f2a;
   color: white;
 }
 
 .toggleButtonActive:hover {
-  background: #1976d2;
+  background: #d81f2a;
+}
+
+.cornerLogo {
+  position: fixed;
+  bottom:0;
+  left: 20px;
+  height: auto;
+  object-fit: contain;
 }
