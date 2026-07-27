@@ -68,9 +68,9 @@ function App() {
 
   return (
     <div className={styles.appContainer}>
-          <header className={styles.header}>
+      <header className={styles.header}>
         <div className={styles.headerRight}>
-          <img src={headerLogo} alt="לוגו תו הזהב" className={styles.headerLogo} />
+          <img src={headerLogo} alt="תו הזהב" className={styles.headerLogo} />
           <span>ממשק ניהול תו הזהב למלונות</span>
         </div>
 
