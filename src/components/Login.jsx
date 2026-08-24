@@ -1,53 +1,49 @@
+// Login.jsx
+
 import { useState } from "react";
-import { sendOtp, verifyOtp } from "../services/authService";
+import { sendOtp } from "../services/authService";
 import styles from "./Login.module.css";
 import appLogo from "../assets/app.png";
 
-function Login({ onLoginSuccess }) {
+function Login({ onOtpSent }) {
   const [userName, setUserName] = useState("");
   const [contactMethod, setContactMethod] = useState("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
-  const [otpCode, setOtpCode] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
-async function handleSendOtp() {
-  try {
-    setErrorMessage("");
-
-    const emailValue = contactMethod === "email" ? email : null;
-    const phoneValue = contactMethod === "phone" ? phoneNumber : null;
-
-    await sendOtp(userName, emailValue, phoneValue);
-    setOtpSent(true);
-  } catch (error) {
-    console.error("Error sending OTP:", error);
-    setOtpSent(false);
-    setErrorMessage("שגיאה בשליחת קוד האימות. בדקי את הפרטים ונסי שוב.");
-  }
-}
-
-  async function handleVerifyOtp() {
+  async function handleSendOtp() {
     try {
       setErrorMessage("");
-      const response = await verifyOtp(userName, otpCode);
+      setIsSending(true);
 
-      localStorage.setItem("accessToken", response.accessToken);
-      localStorage.setItem("refreshToken", response.refreshToken);
+      const emailValue =
+        contactMethod === "email" ? email.trim() : null;
 
-      if (onLoginSuccess) {
-        onLoginSuccess();
+      const phoneValue =
+        contactMethod === "phone" ? phoneNumber.trim() : null;
+
+      await sendOtp(userName.trim(), emailValue, phoneValue);
+
+      sessionStorage.setItem("userName", userName.trim());
+
+      if (onOtpSent) {
+        onOtpSent();
       }
     } catch (error) {
-      console.error("Error verifying OTP:", error);
-      setErrorMessage("קוד האימות שגוי. נסי שוב.");
+      console.error("Error sending OTP:", error);
+
+      setErrorMessage(
+        "שגיאה בשליחת קוד האימות. בדקי את הפרטים ונסי שוב."
+      );
+    } finally {
+      setIsSending(false);
     }
   }
 
   function handleContactMethodChange(method) {
     setContactMethod(method);
-    setOtpSent(false);
     setErrorMessage("");
   }
 
@@ -56,13 +52,13 @@ async function handleSendOtp() {
       <div className={styles.loginContainer}>
         <h2 className={styles.title}>כניסה למערכת</h2>
 
-
         <input
           className={styles.input}
           type="text"
           placeholder="שם משתמש"
           value={userName}
-          onChange={(e) => setUserName(e.target.value)}
+          onChange={(event) => setUserName(event.target.value)}
+          disabled={isSending}
         />
 
         <div className={styles.toggleGroup}>
@@ -74,9 +70,11 @@ async function handleSendOtp() {
                 : styles.toggleButton
             }
             onClick={() => handleContactMethodChange("phone")}
+            disabled={isSending}
           >
             טלפון
           </button>
+
           <button
             type="button"
             className={
@@ -85,6 +83,7 @@ async function handleSendOtp() {
                 : styles.toggleButton
             }
             onClick={() => handleContactMethodChange("email")}
+            disabled={isSending}
           >
             אימייל
           </button>
@@ -96,7 +95,8 @@ async function handleSendOtp() {
             type="tel"
             placeholder="מספר טלפון"
             value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            onChange={(event) => setPhoneNumber(event.target.value)}
+            disabled={isSending}
           />
         ) : (
           <input
@@ -104,41 +104,29 @@ async function handleSendOtp() {
             type="email"
             placeholder="כתובת אימייל"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(event) => setEmail(event.target.value)}
+            disabled={isSending}
           />
         )}
 
-        <button className={styles.buttonSecondary} onClick={handleSendOtp}>
-          {otpSent ? "שלח קוד אימות מחדש" : "שלח קוד אימות"}
-        </button>
-
-        {otpSent && (
-          <div className={styles.successMessage}>
-            ✓ קוד אימות נשלח בהצלחה
-            {contactMethod === "phone" ? " למספר הטלפון" : " לכתובת האימייל"}
+        {errorMessage && (
+          <div className={styles.errorMessage}>
+            {errorMessage}
           </div>
         )}
 
-        {errorMessage && (
-          <div className={styles.errorMessage}>{errorMessage}</div>
-        )}
-
-        <div className={styles.divider}></div>
-
-        <input
-          className={styles.input}
-          type="text"
-          placeholder="קוד אימות"
-          value={otpCode}
-          onChange={(e) => setOtpCode(e.target.value)}
-        />
-
-        <button className={styles.button} onClick={handleVerifyOtp}>
-          כניסה
+        <button
+          type="button"
+          className={styles.buttonSecondary}
+          onClick={handleSendOtp}
+          disabled={isSending}
+        >
+          {isSending ? "שולח קוד אימות..." : "שלח קוד אימות"}
         </button>
       </div>
-<img src={appLogo} alt="לוגו המערכת" className={styles.cornerLogo} />
-      
+
+           <img src={appLogo} alt="לוגו המערכת" className={styles.cornerLogo} />
+
     </div>
   );
 }

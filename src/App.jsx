@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { refreshToken, logout } from "./services/authService";
 import Navigator from "./components/Navigator";
 import Workspace from "./components/Workspace";
-import styles from "./App.module.css";
 import Login from "./components/Login";
+import Otp from "./components/Otp";
+import styles from "./App.module.css";
 import headerLogo from "./assets/logo-zahavt.png";
 
 function App() {
   const [selectedPage, setSelectedPage] = useState("Dashboard");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginStep, setLoginStep] = useState("login");
 
   useEffect(() => {
     async function validateSession() {
@@ -20,12 +22,17 @@ function App() {
 
       try {
         const response = await refreshToken();
+
         localStorage.setItem("accessToken", response.accessToken);
         localStorage.setItem("refreshToken", response.refreshToken);
+
         setIsAuthenticated(true);
-      } catch {
+      } catch (error) {
+        console.error("Session validation failed:", error);
         localStorage.clear();
+        sessionStorage.clear();
         setIsAuthenticated(false);
+        setLoginStep("login");
       }
     }
 
@@ -37,23 +44,37 @@ function App() {
       return;
     }
 
-    const interval = setInterval(
-      async () => {
-        try {
-          const response = await refreshToken();
-          localStorage.setItem("accessToken", response.accessToken);
-          localStorage.setItem("refreshToken", response.refreshToken);
-          console.log("Token refreshed");
-        } catch {
-          localStorage.clear();
-          setIsAuthenticated(false);
-        }
-      },
-      14 * 60 * 1000,
-    );
+    const interval = setInterval(async () => {
+      try {
+        const response = await refreshToken();
+
+        localStorage.setItem("accessToken", response.accessToken);
+        localStorage.setItem("refreshToken", response.refreshToken);
+
+        console.log("Token refreshed");
+      } catch (error) {
+        console.error("Token refresh failed:", error);
+
+        localStorage.clear();
+        sessionStorage.clear();
+        setIsAuthenticated(false);
+        setLoginStep("login");
+      }
+    }, 14 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, [isAuthenticated]);
+
+  function handleLoginSuccess() {
+    sessionStorage.clear();
+    setIsAuthenticated(true);
+    setLoginStep("login");
+  }
+
+  function handleBackToLogin() {
+    sessionStorage.clear();
+    setLoginStep("login");
+  }
 
   async function handleLogout() {
     try {
@@ -62,7 +83,10 @@ function App() {
       console.error("Logout API failed:", error);
     } finally {
       localStorage.clear();
+      sessionStorage.clear();
       setIsAuthenticated(false);
+      setLoginStep("login");
+      setSelectedPage("Dashboard");
     }
   }
 
@@ -70,12 +94,17 @@ function App() {
     <div className={styles.appContainer}>
       <header className={styles.header}>
         <div className={styles.headerRight}>
-          <img src={headerLogo} alt="תו הזהב" className={styles.headerLogo} />
+          <img src={headerLogo} alt="לוגו המערכת" className={styles.headerLogo} />
+
           <span>ממשק ניהול תו הזהב למלונות</span>
         </div>
 
         {isAuthenticated && (
-          <button onClick={handleLogout} className={styles.logoutButton}>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className={styles.logoutButton}
+          >
             התנתקות
           </button>
         )}
@@ -88,10 +117,22 @@ function App() {
               selectedPage={selectedPage}
               setSelectedPage={setSelectedPage}
             />
+
             <Workspace selectedPage={selectedPage} />
           </>
         ) : (
-          <Login onLoginSuccess={() => setIsAuthenticated(true)} />
+          <>
+            {loginStep === "login" && (
+              <Login onOtpSent={() => setLoginStep("otp")} />
+            )}
+
+            {loginStep === "otp" && (
+              <Otp
+                onLoginSuccess={handleLoginSuccess}
+                onBackToLogin={handleBackToLogin}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
