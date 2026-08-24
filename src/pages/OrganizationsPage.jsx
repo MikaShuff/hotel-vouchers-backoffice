@@ -1,3 +1,5 @@
+//OrganizationsPage.jsx
+
 import { useEffect, useState } from "react";
 import {
   getOrganization,
@@ -13,8 +15,11 @@ function OrganizationsPage() {
   const [organization, setOrganization] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingOrganizationId, setEditingOrganizationId] = useState(null);
-  const [selectedOrganizationForBranches, setSelectedOrganizationForBranches] = useState(null);
-  const [selectedOrganizationForUsers, setSelectedOrganizationForUsers] = useState(null);
+  const [editErrorMessage, setEditErrorMessage] = useState("");
+  const [selectedOrganizationForBranches, setSelectedOrganizationForBranches] =
+    useState(null);
+  const [selectedOrganizationForUsers, setSelectedOrganizationForUsers] =
+    useState(null);
 
   // ----- Filters -----
   const [searchText, setSearchText] = useState("");
@@ -43,6 +48,7 @@ function OrganizationsPage() {
   }, []);
 
   function handleEdit(org) {
+    setEditErrorMessage("");
     setEditingOrganizationId(org.id);
     setEditForm({
       name: org.name,
@@ -54,6 +60,7 @@ function OrganizationsPage() {
   }
 
   function handleCancelEdit() {
+    setEditErrorMessage("");
     setEditingOrganizationId(null);
     setEditForm({
       name: "",
@@ -65,21 +72,52 @@ function OrganizationsPage() {
   }
 
   async function handleUpdateOrganization(id) {
+    setEditErrorMessage("");
+
+    const commissionNumber = Number(editForm.commission);
+
+    const maxWithdrawAmountNumber =
+      editForm.maxWithdrawAmount === ""
+        ? null
+        : Number(editForm.maxWithdrawAmount);
+
+    if (editForm.commission === "") {
+      setEditErrorMessage("יש להזין עמלה.");
+      return;
+    }
+
+    if (
+      Number.isNaN(commissionNumber) ||
+      commissionNumber < 0 ||
+      commissionNumber > 100
+    ) {
+      setEditErrorMessage("העמלה חייבת להיות בין 0 ל-100.");
+      return;
+    }
+
+    if (
+      maxWithdrawAmountNumber !== null &&
+      (Number.isNaN(maxWithdrawAmountNumber) || maxWithdrawAmountNumber < 0)
+    ) {
+      setEditErrorMessage("סכום המשיכה המקסימלי לא יכול להיות קטן מ-0.");
+      return;
+    }
+
     try {
       await updateOrganization(
         id,
         editForm.name,
-        Number(editForm.commission),
+        commissionNumber,
         editForm.allowCancel,
         editForm.updateMaxWithdrawAmount,
-        editForm.maxWithdrawAmount === "" ? null : Number(editForm.maxWithdrawAmount),
+        maxWithdrawAmountNumber,
       );
 
       await fetchOrganization();
       handleCancelEdit();
     } catch (error) {
       console.error("Error updating organization:", error);
-      alert("שגיאה בעדכון הארגון");
+      setEditErrorMessage("שגיאה בעדכון הארגון.");
     }
   }
 
@@ -146,10 +184,7 @@ function OrganizationsPage() {
     <div>
       <div className="page-header">
         <h2 className="page-title">ניהול ארגונים</h2>
-        <button
-          className="btn-primary"
-          onClick={() => setShowCreateForm(true)}
-        >
+        <button className="btn-primary" onClick={() => setShowCreateForm(true)}>
           + הוסף ארגון
         </button>
       </div>
@@ -204,6 +239,10 @@ function OrganizationsPage() {
         </span>
       </div>
 
+      {editErrorMessage && (
+        <div className="form-error-message">{editErrorMessage}</div>
+      )}
+      
       <table className="data-table">
         <thead>
           <tr>
@@ -251,10 +290,18 @@ function OrganizationsPage() {
                     <input
                       className="inline-input"
                       type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
                       value={editForm.commission}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, commission: e.target.value })
-                      }
+                      onChange={(event) => {
+                        setEditForm({
+                          ...editForm,
+                          commission: event.target.value,
+                        });
+
+                        setEditErrorMessage("");
+                      }}
                     />
                   ) : (
                     org.commission
@@ -267,7 +314,10 @@ function OrganizationsPage() {
                       type="checkbox"
                       checked={editForm.allowCancel}
                       onChange={(e) =>
-                        setEditForm({ ...editForm, allowCancel: e.target.checked })
+                        setEditForm({
+                          ...editForm,
+                          allowCancel: e.target.checked,
+                        })
                       }
                     />
                   ) : org.allowCancel ? (
@@ -282,17 +332,21 @@ function OrganizationsPage() {
                     <input
                       className="inline-input"
                       type="number"
+                      min="0"
+                      step="0.01"
                       value={editForm.maxWithdrawAmount}
-                      onChange={(e) =>
+                      onChange={(event) => {
                         setEditForm({
                           ...editForm,
-                          maxWithdrawAmount: e.target.value,
+                          maxWithdrawAmount: event.target.value,
                           updateMaxWithdrawAmount: true,
-                        })
-                      }
+                        });
+
+                        setEditErrorMessage("");
+                      }}
                     />
                   ) : (
-                    org.maxWithdrawAmount ?? "-"
+                    (org.maxWithdrawAmount ?? "-")
                   )}
                 </td>
 
@@ -314,7 +368,10 @@ function OrganizationsPage() {
                         >
                           שמור
                         </button>
-                        <button className="btn-secondary" onClick={handleCancelEdit}>
+                        <button
+                          className="btn-secondary"
+                          onClick={handleCancelEdit}
+                        >
                           ביטול
                         </button>
                       </>
@@ -345,7 +402,9 @@ function OrganizationsPage() {
 
                         <button
                           className="btn-secondary"
-                          onClick={() => setSelectedOrganizationForBranches(org)}
+                          onClick={() =>
+                            setSelectedOrganizationForBranches(org)
+                          }
                         >
                           סניפים
                         </button>

@@ -275,3 +275,14 @@
   padding: 40px !important;
   font-style: italic;
 }
+
+.form-error-message {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  color: #c62828;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: right;
+}
