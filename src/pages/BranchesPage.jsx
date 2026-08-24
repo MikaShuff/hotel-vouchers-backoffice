@@ -13,6 +13,7 @@ function BranchesPage({ organization, onBack }) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingBranchId, setEditingBranchId] = useState(null);
   const [selectedBranchForUsers, setSelectedBranchForUsers] = useState(null);
+  const [editErrorMessage, setEditErrorMessage] = useState("");
 
   const [editForm, setEditForm] = useState({
     name: "",
@@ -38,7 +39,10 @@ function BranchesPage({ organization, onBack }) {
   }, [organization.id]);
 
   function handleEdit(branch) {
+    setEditErrorMessage("");
+
     setEditingBranchId(branch.id);
+
     setEditForm({
       name: branch.name,
       terminalUniqueIdentifier: branch.terminalUniqueIdentifier ?? "",
@@ -48,7 +52,10 @@ function BranchesPage({ organization, onBack }) {
   }
 
   function handleCancelEdit() {
+    setEditErrorMessage("");
+
     setEditingBranchId(null);
+
     setEditForm({
       name: "",
       terminalUniqueIdentifier: "",
@@ -58,19 +65,35 @@ function BranchesPage({ organization, onBack }) {
   }
 
   async function handleUpdateBranch(id) {
+    setEditErrorMessage("");
+
+    const maxWithdrawAmountNumber =
+      editForm.maxWithdrawAmount === ""
+        ? null
+        : Number(editForm.maxWithdrawAmount);
+
+    if (
+      maxWithdrawAmountNumber !== null &&
+      (Number.isNaN(maxWithdrawAmountNumber) || maxWithdrawAmountNumber < 0)
+    ) {
+      setEditErrorMessage("סכום המשיכה המקסימלי לא יכול להיות קטן מ-0.");
+      return;
+    }
+
     try {
       await updateBranch(
         id,
         editForm.name,
         editForm.terminalUniqueIdentifier,
         editForm.updateMaxWithdrawAmount,
-        editForm.maxWithdrawAmount === "" ? null : Number(editForm.maxWithdrawAmount),
+        maxWithdrawAmountNumber,
       );
+
       await fetchBranches();
       handleCancelEdit();
     } catch (error) {
       console.error("Error updating branch:", error);
-      alert("שגיאה בעדכון הסניף");
+      setEditErrorMessage("שגיאה בעדכון הסניף");
     }
   }
 
@@ -112,10 +135,7 @@ function BranchesPage({ organization, onBack }) {
 
       <div className="page-header">
         <h2 className="page-title">סניפי {organization.name}</h2>
-        <button
-          className="btn-primary"
-          onClick={() => setShowCreateForm(true)}
-        >
+        <button className="btn-primary" onClick={() => setShowCreateForm(true)}>
           + הוסף סניף
         </button>
       </div>
@@ -131,6 +151,10 @@ function BranchesPage({ organization, onBack }) {
         />
       )}
 
+      {editErrorMessage && (
+        <div className="form-error-message">{editErrorMessage}</div>
+      )}
+      
       <table className="data-table">
         <thead>
           <tr>
@@ -177,7 +201,7 @@ function BranchesPage({ organization, onBack }) {
                     }
                   />
                 ) : (
-                  branch.terminalUniqueIdentifier ?? "-"
+                  (branch.terminalUniqueIdentifier ?? "-")
                 )}
               </td>
 
@@ -186,6 +210,8 @@ function BranchesPage({ organization, onBack }) {
                   <input
                     className="inline-input"
                     type="number"
+                    min="0"
+                    step="0.01"
                     value={editForm.maxWithdrawAmount}
                     onChange={(e) =>
                       setEditForm({
@@ -196,7 +222,7 @@ function BranchesPage({ organization, onBack }) {
                     }
                   />
                 ) : (
-                  branch.maxWithdrawAmount ?? "-"
+                  (branch.maxWithdrawAmount ?? "-")
                 )}
               </td>
 

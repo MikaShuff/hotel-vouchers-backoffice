@@ -6,14 +6,28 @@ function CreateBranchForm({ organization, onCreated, onCancel }) {
   const [name, setName] = useState("");
   const [terminalUniqueIdentifier, setTerminalUniqueIdentifier] = useState("");
   const [maxWithdrawAmount, setMaxWithdrawAmount] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSave() {
+    setErrorMessage("");
+
+    const maxWithdrawAmountNumber =
+      maxWithdrawAmount === "" ? null : Number(maxWithdrawAmount);
+
+    if (
+      maxWithdrawAmountNumber !== null &&
+      (Number.isNaN(maxWithdrawAmountNumber) || maxWithdrawAmountNumber < 0)
+    ) {
+      setErrorMessage("סכום המשיכה המקסימלי לא יכול להיות קטן מ-0.");
+      return;
+    }
+
     try {
       await createBranch(
         name,
         organization.id,
         terminalUniqueIdentifier,
-        maxWithdrawAmount === "" ? null : Number(maxWithdrawAmount),
+        maxWithdrawAmountNumber,
       );
 
       if (onCreated) {
@@ -21,7 +35,7 @@ function CreateBranchForm({ organization, onCreated, onCancel }) {
       }
     } catch (error) {
       console.error(error);
-      alert("שגיאה ביצירת הסניף");
+      setErrorMessage("שגיאה ביצירת הסניף");
     }
   }
 
@@ -66,12 +80,16 @@ function CreateBranchForm({ organization, onCreated, onCancel }) {
           <input
             className={styles.input}
             type="number"
+            min="0"
+            step="0.01"
             placeholder="ניתן להשאיר ריק"
             value={maxWithdrawAmount}
             onChange={(e) => setMaxWithdrawAmount(e.target.value)}
           />
         </div>
-
+        {errorMessage && (
+          <div className="form-error-message">{errorMessage}</div>
+        )}
         <div className={styles.actions}>
           <button className={styles.saveButton} onClick={handleSave}>
             שמור
